@@ -13,9 +13,9 @@ contract SimpleERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
-    constructor(string memory _name, string memory _symbol, uint256 _initialSupply) {
+    constructor(string memory _name, uint256 _initialSupply) {
         name = _name;
-        symbol = _symbol;
+        symbol = _name;
         totalSupply = _initialSupply * (10 ** uint256(decimals));
         balanceOf[msg.sender] = totalSupply;
         emit Transfer(address(0), msg.sender, totalSupply);
