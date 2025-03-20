@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 /// @title Simple ERC-721 NFT Contract (without OpenZeppelin)
 /// @author ChatGPT
-contract SimpleERC721 {
+contract SimpleERC721  {
     // 事件定義
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
     event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
@@ -32,7 +32,7 @@ contract SimpleERC721 {
     mapping(uint256 => string) private _tokenURIs;
 
     /// @dev 建構函數
-    constructor(string memory _name, string memory _symbol) {
+    constructor(string memory _name, string memory _symbol) payable{
         name = _name;
         symbol = _symbol;
     }
@@ -51,24 +51,26 @@ contract SimpleERC721 {
     }
 
     /// @notice 鑄造 NFT
-    function mint(address to, string memory tokenURI) public {
-        require(to != address(0), "Mint to zero address");
+function mint(address to, string memory uri) public {
+    require(to != address(0), "Mint to zero address");
 
-        uint256 tokenId = _tokenIdCounter;
-        _tokenIdCounter++;
+    uint256 tokenId = _tokenIdCounter;
+    _tokenIdCounter++;
 
-        _owners[tokenId] = to;
-        _balances[to]++;
+    _owners[tokenId] = to;
+    _balances[to]++;
 
-        _tokenURIs[tokenId] = tokenURI;
+    string memory fullURI = string(abi.encodePacked("ipfs://", uri, "/"));
 
-        emit Transfer(address(0), to, tokenId);
-    }
+    _tokenURIs[tokenId] = fullURI;
+
+    emit Transfer(address(0), to, tokenId);
+}
 
     /// @notice 設定 NFT 的 Metadata URI
-    function _setTokenURI(uint256 tokenId, string memory tokenURI) internal {
+    function _setTokenURI(uint256 tokenId, string memory uri) internal {
         require(_owners[tokenId] != address(0), "Token does not exist");
-        _tokenURIs[tokenId] = tokenURI;
+        _tokenURIs[tokenId] = uri;
     }
 
     /// @notice 查詢 NFT Metadata
@@ -94,7 +96,7 @@ contract SimpleERC721 {
     /// @notice 安全轉移 NFT
     function safeTransferFrom(address from, address to, uint256 tokenId) public {
         transferFrom(from, to, tokenId);
-        require(_checkOnERC721Received(from, to, tokenId), "Receiver not ERC721 compliant");
+        require(_checkOnERC721Received(), "Receiver not ERC721 compliant");
     }
 
     /// @notice 授權某人可以轉移你的 NFT
@@ -135,8 +137,8 @@ contract SimpleERC721 {
         return (spender == owner || _tokenApprovals[tokenId] == spender || _operatorApprovals[owner][spender]);
     }
 
-    /// @dev 檢查接收者是否支持 ERC721 接口
-    function _checkOnERC721Received(address from, address to, uint256 tokenId) private pure returns (bool) {
-        return true; // 簡單化處理，實際應用時可加入 IERC721Receiver 接口檢查
+    /// @dev 簡化 ERC721Receiver 檢查（移除未使用變數）
+    function _checkOnERC721Received() private pure returns (bool) {
+        return true;
     }
 }
